@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <form method="post" id="recipe-form" action="{{ path('app_addRecipe') }}">
+            <div class="form-group">
+                <label for="recipe_name">Recipe Name</label>
+                <input type="text" class="form-control" id="recipe_name" name="recipe_name">
+            </div>
+            <div class="form-group">
+                <label for="recipe_description">Recipe Description</label>
+                <textarea class="form-control" id="recipe_description" name="recipe_description"></textarea>
+            </div>
+            <div class="form-group">
+                <h3>Ingredients</h3>
+                <ul id="ingredients_list">
+                    <li class="form-row mb-2">
+                        <div class="col">
+                            <label for="ingredient_1_name">Name:</label>
+                            <input type="text" class="form-control" id="ingredient_1_name" name="ingredient[1][name]">
+                        </div>
+                        <div class="col">
+                            <label for="ingredient_1_unit">Unit:</label>
+                            <input type="text" class="form-control" id="ingredient_1_unit" name="ingredient[1][unit]">
+                        </div>
+                        <div class="col">
+                            <label for="ingredient_1_amount">Amount:</label>
+                            <input type="text" class="form-control" id="ingredient_1_amount" name="ingredient[1][amount]">
+                        </div>
+                    </li>
+                    <!-- You can add more ingredients by clicking the "Add Ingredient" button -->
+                </ul>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-light" id="add-ingredient-btn">Add Ingredient</button>
+                </div>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-danger ml-3" id="remove-ingredient-btn">Remove Last Ingredient</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Submit Recipe</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- Import jQuery library -->
+    <script>
+        $(document).ready(function() {
+            var ingredientCount = 1; // Start with one ingredient input field
+            $('#add-ingredient-btn').click(function() {
+                ingredientCount++; // Increment ingredientCount
+                $('#ingredients_list').append('<li class="form-row mb-2"><div class="col"><label for="ingredient_'+ingredientCount+'_name">Name:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_name" name="ingredient['+ingredientCount+'][name]"></div><div class="col"><label for="ingredient_'+ingredientCount+'_unit">Unit:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_unit" name="ingredient['+ingredientCount+'][unit]"></div><div class="col"><label for="ingredient_'+ingredientCount+'_amount">Amount:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_amount" name="ingredient['+ingredientCount+'][amount]"></div></li>');
+            });
+            $('#remove-ingredient-btn').click(function() {
+                if (ingredientCount > 1) { // Only remove if there's more than one ingredient input field
+                    $('#ingredients_list li:last-child').remove();
+                    ingredientCount--; // Decrement ingredientCount
+                }
+            });
+        });
+    </script>
+{% endblock %}

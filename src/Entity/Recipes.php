@@ -13,16 +13,19 @@ class Recipes
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    public ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $description = null;
+    public ?string $description = null;
 
-    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredients::class, orphanRemoval: true)]
-    private Collection $recipeIngredients;
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredients::class, fetch: "EAGER", orphanRemoval: true)]
+    public Collection $recipeIngredients;
+
+    #[ORM\Column]
+    private ?int $status = 0;
 
     public function __construct()
     {
@@ -84,6 +87,18 @@ class Recipes
                 $recipeIngredient->setRecipe(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

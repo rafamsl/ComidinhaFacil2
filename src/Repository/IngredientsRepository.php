@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\DTO\IngredientDTO;
+use App\DTO\RecipeIngredientDTO;
 use App\Entity\Ingredients;
+use App\Entity\Recipes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,9 +19,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class IngredientsRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public RecipeIngredientsRepository $recipeIngredientsRepository;
+
+    public function __construct(ManagerRegistry $registry, RecipeIngredientsRepository $recipeIngredientsRepository)
     {
         parent::__construct($registry, Ingredients::class);
+        $this->recipeIngredientsRepository = $recipeIngredientsRepository;
     }
 
     public function save(Ingredients $entity, bool $flush = false): void
@@ -37,6 +43,30 @@ class IngredientsRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function buildFromArray(array $ingredients, Recipes $recipe){
+        foreach ($ingredients as $recipeIngredient){
+            $ingredient = $this->findOneBy(['name'=>$recipeIngredient['name']]);
+            if (!$ingredient instanceof Ingredients){
+                $ingredientDTO = new IngredientDTO($recipeIngredient['name'], $recipeIngredient['unit']);
+                $ingredient = $this->buildFromDTO($ingredientDTO);
+            }
+
+            $newRecipeIngredientDTO = new RecipeIngredientDTO($recipe, $ingredient,$recipeIngredient['amount']);
+            $this->recipeIngredientsRepository->buildFromDTO($newRecipeIngredientDTO);
+        }
+    }
+
+    public function buildFromDTO(IngredientDTO $ingredientDTO): Ingredients
+    {
+        $ingredient = new Ingredients();
+        $ingredient->setName($ingredientDTO->name);
+        $ingredient->setUnit($ingredientDTO->unit);
+
+        $this->save($ingredient, true);
+
+        return $ingredient;
     }
 
 //    /**

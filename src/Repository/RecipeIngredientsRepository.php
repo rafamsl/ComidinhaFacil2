@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\RecipeIngredientDTO;
 use App\Entity\RecipeIngredients;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,18 @@ class RecipeIngredientsRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function buildFromDTO(RecipeIngredientDTO $recipeIngredientsDTO): RecipeIngredients
+    {
+        $recipeIngredient = new RecipeIngredients();
+        $recipeIngredient->setRecipe($recipeIngredientsDTO->getRecipe());
+        $recipeIngredient->setIngredient($recipeIngredientsDTO->getIngredient());
+        $recipeIngredient->setAmount($recipeIngredientsDTO->getAmount());
+
+        $this->save($recipeIngredient, true);
+
+        return $recipeIngredient;
     }
 
 //    /**

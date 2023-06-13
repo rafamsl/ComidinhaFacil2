@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="mt-5">Ingredients</h2>
+        <div class="row mt-3">
+            {% for ingredient in ingredients %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ ingredient.name }}</h5>
+                            <p class="card-text">{{ ingredient.amount }} {{ ingredient.unit }}</p>
+                            <ul class="list-group list-group-flush">
+                                <h5 class="card-title">Recipes</h5>
+                                {% for recipe in ingredient.recipes %}
+                                    <li class="list-group-item"><a href="viewRecipe/{{ recipe.id }}">{{ recipe.name }}</a></li>
+                                {% endfor %}
+                                <a href="/removeIngredient/{{ingredient.name}}" class="btn btn-outline-success btn-sm mt-2">Remove from List</a>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %} 

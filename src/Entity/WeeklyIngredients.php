@@ -13,40 +13,80 @@ class WeeklyIngredients
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'weeklyIngredients')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?WeeklyRecipes $weeklyRecipe = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?RecipeIngredients $recipeIngredient = null;
-
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getWeeklyRecipe(): ?WeeklyRecipes
+    /**
+     * @param int|null $id
+     */
+    public function setId(?int $id): void
     {
-        return $this->weeklyRecipe;
+        $this->id = $id;
     }
 
-    public function setWeeklyRecipe(?WeeklyRecipes $weeklyRecipe): self
+    /**
+     * @return Ingredients|null
+     */
+    public function getIngredient(): ?Ingredients
     {
-        $this->weeklyRecipe = $weeklyRecipe;
-
-        return $this;
+        return $this->ingredient;
     }
 
-    public function getRecipeIngredient(): ?RecipeIngredients
+    /**
+     * @param Ingredients|null $ingredient
+     */
+    public function setIngredient(?Ingredients $ingredient): void
     {
-        return $this->recipeIngredient;
+        $this->ingredient = $ingredient;
     }
 
-    public function setRecipeIngredient(?RecipeIngredients $recipeIngredient): self
+    /**
+     * @return Recipes|null
+     */
+    public function getRecipe(): ?Recipes
     {
-        $this->recipeIngredient = $recipeIngredient;
-
-        return $this;
+        return $this->recipe;
     }
+
+    /**
+     * @param Recipes|null $recipe
+     */
+    public function setRecipe(?Recipes $recipe): void
+    {
+        $this->recipe = $recipe;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param float|null $amount
+     */
+    public function setAmount(?float $amount): void
+    {
+        $this->amount = $amount;
+    }
+
+    #[ORM\ManyToOne(fetch:"EAGER")]
+    #[ORM\JoinColumn(nullable: false)]
+    public ?Ingredients $ingredient = null;
+
+    #[ORM\ManyToOne()]
+    #[ORM\JoinColumn(nullable: false)]
+    public ?Recipes $recipe = null;
+
+    #[ORM\Column]
+    private ?float $amount = null;
+
+
 }

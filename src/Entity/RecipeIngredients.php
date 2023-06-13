@@ -15,14 +15,14 @@ class RecipeIngredients
 
     #[ORM\ManyToOne(inversedBy: 'recipeIngredients')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Recipes $recipe = null;
+    public ?Recipes $recipe = null;
 
-    #[ORM\ManyToOne(inversedBy: 'recipeIngredients')]
+    #[ORM\ManyToOne(inversedBy: 'recipeIngredients', fetch: "EAGER")]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Ingredients $ingredient = null;
+    public ?Ingredients $ingredient = null;
 
     #[ORM\Column]
-    private ?int $amount = null;
+    public ?int $amount = null;
 
     public function getId(): ?int
     {
