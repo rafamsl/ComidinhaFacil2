@@ -4,16 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Ingredients;
 use App\Repository\IngredientsRepository;
+use App\Repository\UserRepository;
 use App\Repository\WeeklyIngredientsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted("ROLE_USER")]
 class WeeklyIngredientsController extends AbstractController
 {
     #[Route("/weeklyIngredients", name:"app_viewWeeklyIngredients", methods:["GET"])]
-    public function viewAllWeeklyIngredients(WeeklyIngredientsRepository $weeklyIngredientsRepository){
-        $weeklyIngredients = $weeklyIngredientsRepository->groceryList();
+    public function viewAllWeeklyIngredients(UserRepository $userRepository,WeeklyIngredientsRepository $weeklyIngredientsRepository){
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $weeklyIngredients = $weeklyIngredientsRepository->groceryList($user);
         return $this->render('ingredients/ingredients.html.twig',[
             'ingredients' => $weeklyIngredients,
         ]);

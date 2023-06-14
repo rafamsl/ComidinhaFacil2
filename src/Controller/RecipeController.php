@@ -7,18 +7,30 @@ use App\DTO\RecipeResponseDTO;
 use App\Entity\Recipes;
 use App\Repository\IngredientsRepository;
 use App\Repository\RecipesRepository;
+use App\Repository\UserRepository;
 use App\Repository\WeeklyRecipesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted("ROLE_USER")]
 class RecipeController extends AbstractController
 {
     #[Route("/recipes", name: "app_recipes")]
     public function allRecipes(RecipesRepository $recipesRepository, WeeklyRecipesRepository $weeklyRecipesRepository){
-        $recipes = $recipesRepository->findBy(['status' => 0]);
-        $weeklyRecipes = $weeklyRecipesRepository->findAll();
+        $user = $this->getUser();
+        $weeklyRecipes = [];
+        $recipes = $recipesRepository->findBy(['owner' => $user]);
+        foreach($recipes as $key => $recipe) {
+            if($recipe->getStatus() === 1) {
+                $weeklyRecipes[] = $recipe;
+                unset($recipes[$key]);
+            }
+        }
+
+
         return $this->render('recipes/recipes.html.twig',[
             'recipes' => $recipes,
             'weeklyRecipes' => $weeklyRecipes,
@@ -30,12 +42,15 @@ class RecipeController extends AbstractController
     }
 
     #[Route("/addRecipe", name: "app_addRecipe", methods: ["POST"])]
-    public function addRecipe(Request $request, RecipesRepository $recipesRepository, IngredientsRepository $ingredientsRepository): RedirectResponse
+    public function addRecipe(Request $request,UserRepository $userRepository, RecipesRepository $recipesRepository, IngredientsRepository $ingredientsRepository): RedirectResponse
     {
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         $newRecipeRequest = $request->request->all();
         $newRecipeDTO = new RecipeDTO(
             $newRecipeRequest['recipe_name'],
-            $newRecipeRequest['recipe_description']);
+            $newRecipeRequest['recipe_description'],
+            $user,
+        );
         $newRecipe = $recipesRepository->buildFromDTO($newRecipeDTO);
 
         $ingredientsRepository->buildFromArray($newRecipeRequest['ingredient'],$newRecipe);
@@ -102,10 +117,16 @@ class RecipeController extends AbstractController
     }
 
     #[Route("/viewRecipe/{recipeId}", name: "app_viewRecipe", methods: ["GET"])]
-    public function viewRecipe(int $recipeId, RecipesRepository $recipesRepository){
+    public function viewRecipe(int $recipeId, RecipesRepository $recipesRepository, UserRepository $userRepository){
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         $recipe = $recipesRepository->find($recipeId);
 
         $recipeResponseDTO = new RecipeResponseDTO($recipe);
+
+        if(!$user === $recipe->getOwner()){
+            $this->addFlash('error','Access to recipe denied');
+            return new RedirectResponse("/recipes");
+        }
 
         return $this->render("recipes/viewRecipe.html.twig",[
             'recipe'=>$recipeResponseDTO,

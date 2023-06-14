@@ -25,7 +25,11 @@ class Recipes
     public Collection $recipeIngredients;
 
     #[ORM\Column]
-    private ?int $status = 0;
+    public ?int $status = 0;
+
+    #[ORM\ManyToOne(inversedBy: 'recipes')]
+    #[ORM\JoinColumn(nullable: false)]
+    public ?User $owner = null;
 
     public function __construct()
     {
@@ -99,6 +103,18 @@ class Recipes
     public function setStatus(int $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

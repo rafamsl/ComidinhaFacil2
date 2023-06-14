@@ -17,8 +17,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RecipesRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public UserRepository $userRepository;
+    public function __construct(ManagerRegistry $registry, UserRepository $userRepository)
     {
+        $this->userRepository = $userRepository;
         parent::__construct($registry, Recipes::class);
     }
 
@@ -46,7 +48,12 @@ class RecipesRepository extends ServiceEntityRepository
         $newRecipe->setName($newRecipeDTO->name);
         $newRecipe->setDescription($newRecipeDTO->description);
 
+        # Add to User
+        $user = $newRecipeDTO->getOwner();
+        $user->addRecipe($newRecipe);
+
         $this->save($newRecipe, true);
+        $this->userRepository->save($user,true);
 
         return $newRecipe;
     }

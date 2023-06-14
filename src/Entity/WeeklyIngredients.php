@@ -81,7 +81,7 @@ class WeeklyIngredients
     #[ORM\JoinColumn(nullable: false)]
     public ?Ingredients $ingredient = null;
 
-    #[ORM\ManyToOne()]
+    #[ORM\ManyToOne(fetch:"EAGER")]
     #[ORM\JoinColumn(nullable: false)]
     public ?Recipes $recipe = null;
 

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\DTO\WeeklyIngredientDTO;
 use App\Entity\Recipes;
+use App\Entity\User;
 use App\Entity\WeeklyIngredients;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -67,10 +68,15 @@ class WeeklyIngredientsRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function groceryList(): ArrayCollection
+    public function groceryList(User $user): ArrayCollection
     {
         $weeklyIngredientsResponse = new ArrayCollection();
-        $weeklyIngredients = $this->findAll();
+        $weeklyIngredients = $this->createQueryBuilder('wr')
+            ->join('wr.recipe','r')
+            ->where('r.owner =:user')
+            ->setParameter('user',$user)
+            ->getQuery()
+            ->getResult();
 
         foreach ($weeklyIngredients as $weeklyIngredient){
             $ingredientName = $weeklyIngredient->getIngredient()->getName();
