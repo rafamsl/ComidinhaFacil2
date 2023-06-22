@@ -1,6 +1,17 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+{#    <div class="container">#}
+{#        <form method="post" id="ai-form" action="{{ path('app_ai') }}">#}
+{#            <div class="form-group">#}
+{#                <label for="ai">Tell us what you'd like to eat</label>#}
+{#                <textarea class="form-control" id="ai" name="ai"></textarea>#}
+{#            </div>#}
+{#            <div class="mb-3">#}
+{#                <button type="submit" class="btn btn-success">Generate Recipe with AI</button>#}
+{#            </div>#}
+{#        </form>#}
+{#    </div>#}
     <div class="container">
         <form method="post" id="recipe-form" action="{{ path('app_addRecipe') }}">
             <div class="form-group">

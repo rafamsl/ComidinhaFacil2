@@ -10,14 +10,17 @@ use App\Repository\RecipesRepository;
 use App\Repository\UserRepository;
 use App\Repository\WeeklyRecipesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_USER")]
 class RecipeController extends AbstractController
 {
+
     #[Route("/recipes", name: "app_recipes")]
     public function allRecipes(RecipesRepository $recipesRepository, WeeklyRecipesRepository $weeklyRecipesRepository){
         $user = $this->getUser();
@@ -131,6 +134,28 @@ class RecipeController extends AbstractController
         return $this->render("recipes/viewRecipe.html.twig",[
             'recipe'=>$recipeResponseDTO,
         ]);
+        }
+    #[Route("/ai", name:"app_ai")]
+    public function ai(Request $request){
+        $request_object = $request->request->all();
+        $user_input = $request_object['ai'];
+        $prompt = "You are a food chef, specialized in simple recipes that make people's daily life healthier and simpler. Your task is to suggest a good recipe that most people will like to eat with simple ingredients.
+            
+            Please output a structured object in the following format:
 
+            - Recipe name
+            - Recipe short description
+            - Recipe ingredients (include each ingredient name, amount and units
+            
+            The suggested recipe should be based on the following instructions: 
+            " . $user_input;
+        $client = \OpenAI::client('tbd');
+        $result = $client->completions()->create([
+            'model' => 'text-davinci-003',
+            'max_tokens'=> 1000,
+            'prompt' => $prompt,
+        ]);
+        $output = $result['choices'][0]['text'];
+        dd($output);
     }
 }
