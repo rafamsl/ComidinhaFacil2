@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="mb-3">
+            <button href="{{ path('app_viewAddRecipe') }}" class="btn btn-success">Create Recipe Manually</button>
+        </div>
+        <div class="mb-3">
+            <button href="{{ path('app_ai') }}" class="btn btn-success">Generate Recipe with AI</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- Import jQuery library -->
+    <script>
+        $(document).ready(function() {
+            var ingredientCount = 1; // Start with one ingredient input field
+            $('#add-ingredient-btn').click(function() {
+                ingredientCount++; // Increment ingredientCount
+                $('#ingredients_list').append('<li class="form-row mb-2"><div class="col"><label for="ingredient_'+ingredientCount+'_name">Name:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_name" name="ingredient['+ingredientCount+'][name]"></div><div class="col"><label for="ingredient_'+ingredientCount+'_unit">Unit:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_unit" name="ingredient['+ingredientCount+'][unit]"></div><div class="col"><label for="ingredient_'+ingredientCount+'_amount">Amount:</label><input type="text" class="form-control" id="ingredient_'+ingredientCount+'_amount" name="ingredient['+ingredientCount+'][amount]"></div></li>');
+            });
+            $('#remove-ingredient-btn').click(function() {
+                if (ingredientCount > 1) { // Only remove if there's more than one ingredient input field
+                    $('#ingredients_list li:last-child').remove();
+                    ingredientCount--; // Decrement ingredientCount
+                }
+            });
+        });
+    </script>
+{% endblock %}
